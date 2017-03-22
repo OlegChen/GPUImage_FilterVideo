@@ -75,7 +75,6 @@
     _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
     [self.view addSubview: _filterView];
     
-//    _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
 
     
     [_videoCamera addTarget:_filter];
@@ -221,6 +220,66 @@
 
     
 }
+
+#pragma mark - ------ 滤镜切换
+
+
+-(void)changeEffct:(GPUImageFilter *)mFilter withBtn:(UIButton *)btn{
+    
+//    //移除上一个效果
+//    [_mCamera removeTarget:_mFilter];
+//    
+//    _mFilter = mFilter;
+//    
+//    // 添加滤镜到相机上
+//    [_mCamera addTarget:_mFilter];
+//    [_mFilter addTarget:_mGPUImageView];
+//    
+//    //调用收缩滤镜方法的方法
+//    [self resumeState];
+//    [self btnState:btn];
+    
+}
+
+//
+//- (void)btnAction:(UIButton *)btn{
+//    
+//    switch (btn.tag) {
+//        case (EffctTypeOne):{
+//            //创建一个新的滤镜
+//            GPUImageBulgeDistortionFilter *mfilter = [[GPUImageBulgeDistortionFilter alloc]init];
+//            
+//            //调用切换滤镜方法
+//            [self changeEffct:mfilter withBtn:btn];
+//        }
+//            break;
+//        case (EffctTypeTwo):{
+//            GPUImagePinchDistortionFilter *mfilter = [[GPUImagePinchDistortionFilter alloc]init];
+//            [self changeEffct:mfilter withBtn:btn];
+//        }
+//            break;
+//        case (EffctTypeThree):{
+//            GPUImageStretchDistortionFilter *mfilter = [[GPUImageStretchDistortionFilter alloc]init];
+//            [self changeEffct:mfilter withBtn:btn];
+//        }
+//            break;
+//        case (EffctTypeFour):{
+//            GPUImageGlassSphereFilter *mfilter = [[GPUImageGlassSphereFilter alloc]init];
+//            
+//            [self changeEffct:mfilter withBtn:btn];
+//        }
+//            break;
+//        case (EffctTypeFive):{
+//            GPUImageVignetteFilter *mfilter = [[GPUImageVignetteFilter alloc]init];
+//            [self changeEffct:mfilter withBtn:btn];
+//        }
+//            break;
+//            
+//        default:
+//            break;
+//    }
+//}
+
 
 
 - (void)didReceiveMemoryWarning {

@@ -1,0 +1,9 @@
+
+platform :ios, "8.0"
+
+target "GPUImage_FilterVideo" do
+
+pod 'GPUImage', '~> 0.1.7' 
+pod 'Masonry'
+
+end

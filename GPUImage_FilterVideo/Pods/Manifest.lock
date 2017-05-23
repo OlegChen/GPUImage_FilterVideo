@@ -1,15 +1,12 @@
 PODS:
-  - GPUImage (0.1.7)
   - Masonry (1.0.2)
 
 DEPENDENCIES:
-  - GPUImage (~> 0.1.7)
   - Masonry
 
 SPEC CHECKSUMS:
-  GPUImage: 733a5f0fab92df9de1c37ba9df520a833ccb406d
   Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
 
-PODFILE CHECKSUM: 9cf174c55be9477dc7c672f685aab52e2cc1ccd7
+PODFILE CHECKSUM: ad7e7b69df5ee6bcbfa435b1be3ecd9472e4f14e
 
 COCOAPODS: 1.2.0

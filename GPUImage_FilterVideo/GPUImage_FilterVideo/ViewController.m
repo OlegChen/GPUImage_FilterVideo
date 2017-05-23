@@ -22,6 +22,7 @@
     UIButton *btn = [[UIButton alloc]init];
     [btn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
     btn.backgroundColor = [UIColor redColor];
+    [btn setTitle:@"滤镜拍摄" forState:UIControlStateNormal];
     [self.view addSubview:btn];
     btn.frame = CGRectMake(100, 100, 100, 35);
     

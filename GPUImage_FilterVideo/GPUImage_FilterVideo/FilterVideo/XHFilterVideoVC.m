@@ -15,15 +15,18 @@
 #import "MBProgressHUD+MJ.h"
 
 #import "OETabbar.h"
-#import "RecordButton.h"
 #import "GPUImageBeautifyFilter.h"
 
+#import "Masonry.h"
+
+#import "FilterListCollectionView.h"
+
 #define ScreenWidth ([UIScreen mainScreen].bounds.size.width)
-#define ScreenHeight ([UIScreen mainScreen].bounds.size.width)
+#define ScreenHeight ([UIScreen mainScreen].bounds.size.height)
 #define PathToMovie ([NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Movie4.mp4"])
 
 
-@interface XHFilterVideoVC ()<GPUImageVideoCameraDelegate,OETabbarDelegate>
+@interface XHFilterVideoVC ()<GPUImageVideoCameraDelegate,OETabbarDelegate , FilterListCollectionViewDelegate>
 
 @property (nonatomic , strong) GPUImageVideoCamera *videoCamera;
 @property (nonatomic , strong) GPUImageOutput<GPUImageInput> *filter;
@@ -36,12 +39,8 @@
 
 @property (nonatomic,strong) OETabbar *tabbar;
 
-
-@property (strong, nonatomic) AVCaptureMetadataOutput *medaDataOutput;
-@property (strong, nonatomic) dispatch_queue_t captureQueue;
-@property (nonatomic, strong) NSArray *faceObjects;
-
-@property (nonatomic,strong) UILabel * faceBorderLab;
+@property (nonatomic ,strong) UIButton *FilterListBtn;
+@property (nonatomic ,strong) FilterListCollectionView *FilterListCollection;
 
 @end
 
@@ -52,25 +51,28 @@
 //        [self setupView];
         [self setupCameraView];
         [self setupTabbar];
-//        [self setupPopupAnimation];
+        
+        [self setupFilterListBtn];
     }
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+
+    self.view.backgroundColor = [UIColor whiteColor];
+    
 }
 
 
 - (void)setupCameraView {
-    _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionBack];
+    _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionBack];
     [_videoCamera addAudioInputsAndOutputs];
     _videoCamera.outputImageOrientation = [UIApplication sharedApplication].statusBarOrientation;
     _videoCamera.delegate = self;
     
     _filter = [[GPUImageBeautifyFilter alloc] init];
-    CGRect frame = CGRectMake(0, 70.f, ScreenWidth , ScreenWidth);
+    CGRect frame = self.view.bounds;//CGRectMake(0, 0.f, ScreenWidth , ScreenWidth);
     _filterView = [[GPUImageView alloc] initWithFrame:frame];
     _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
     [self.view addSubview: _filterView];
@@ -86,6 +88,45 @@
 }
 
 
+- (void)setupFilterListBtn{
+    
+    _FilterListBtn = [[UIButton alloc]init];
+    [self.view addSubview:_FilterListBtn];
+    [_FilterListBtn addTarget:self action:@selector(FilterListBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    _FilterListBtn.backgroundColor = [UIColor redColor];
+    [_FilterListBtn setTitle:@"滤镜展开" forState:UIControlStateNormal];
+    [_FilterListBtn setTitle:@"滤镜关闭" forState:UIControlStateSelected];
+    _FilterListBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+    [_FilterListBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.size.mas_equalTo(CGSizeMake(70, 45));
+        make.bottom.equalTo(self.tabbar.mas_top).offset(- 50);
+        make.left.equalTo(self.tabbar).offset(15);
+
+    }];
+    
+}
+
+
+- (void)FilterListBtnClick:(UIButton *)btn{
+
+    if (btn.isSelected) {
+        
+        //关闭
+        self.FilterListCollection.hidden = YES;
+        
+    }else{
+    
+        //展开
+        self.FilterListCollection.hidden = NO;
+    
+    }
+    
+    
+    btn.selected = !btn.isSelected;
+
+}
+
 
 - (void)setupTabbar {
     
@@ -100,27 +141,21 @@
 -(void)tabbarDidCancelRecord {
     
     [self cancelCamre];
-//    if (self.videoMaxTime>0){
-//        [self stopTimer];
-//    }
+
 }
 -(void)tabbarDidRecordComplete {
     
-//    if (self.videoMaxTime > 0.0 && self.timer == nil){//时间到与手势完成重复执行了stopCamre方法 判断避免重复保存
-//        return;
-//    }
     [self stopCamre];
-//    if (self.videoMaxTime > 0.0){
-//        [self stopTimer];
-//    }
+    
+    self.FilterListBtn.enabled = YES;
     
 }
 -(void)tabbarDidRecord {
+    
     [self startCamre];
-//    if (self.videoMaxTime>0){
-//        //        [self.tabbar progressStart];
-//        [self startTimer];
-//    }
+
+    self.FilterListBtn.enabled = NO;
+
 }
 
 #pragma mark - OETabBarDelegate
@@ -147,21 +182,17 @@
 }
 
 - (void)startCamre {
-//    if ([self.delegate respondsToSelector:@selector(popVideoControllerWillOutputSampleBuffer:)]) {
-//        _videoCamera.delegate = self;
-//    }
 
-    
-//    if ([self.delegate respondsToSelector:@selector(popVideoControllerDidSave:)]) {
         NSURL *movieURL = [NSURL fileURLWithPath:PathToMovie];
         unlink([PathToMovie UTF8String]); // 如果已经存在文件，AVAssetWriter会有异常，删除旧文件
-        _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(480, 640)];
+        _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(540, 960)];
         _movieWriter.encodingLiveVideo = YES;
         [_filter addTarget:_movieWriter];
         _videoCamera.audioEncodingTarget = _movieWriter;
         [_movieWriter startRecording];
-//    }
+
 }
+
 - (void)cancelCamre {
     _videoCamera.delegate = nil;
     [_filter removeTarget:_movieWriter];
@@ -172,22 +203,16 @@
 
 - (void)stopCamre {
     
-//    if ([self.delegate respondsToSelector:@selector(popVideoControllerWillOutputSampleBuffer:)]) {
-//        _videoCamera.delegate = nil;
-//    }
-    
-//    if ([self.delegate respondsToSelector:@selector(popVideoControllerDidSave:)]) {
+
         [_filter removeTarget:_movieWriter];
         _videoCamera.audioEncodingTarget = nil;
         [_movieWriter finishRecordingWithCompletionHandler:^{
             dispatch_async(dispatch_get_main_queue(), ^{
-//                [self.delegate popVideoControllerDidSave:PathToMovie];
                 
                 //保存
                  [self savePhoneLibrary:PathToMovie];
             });
         }];
-//    }
 }
 
 //保存到相册
@@ -224,61 +249,61 @@
 #pragma mark - ------ 滤镜切换
 
 
--(void)changeEffct:(GPUImageFilter *)mFilter withBtn:(UIButton *)btn{
+-(void)changeEffct:(GPUImageFilterGroup *)mFilter{
     
 //    //移除上一个效果
-//    [_mCamera removeTarget:_mFilter];
-//    
-//    _mFilter = mFilter;
-//    
-//    // 添加滤镜到相机上
-//    [_mCamera addTarget:_mFilter];
-//    [_mFilter addTarget:_mGPUImageView];
-//    
-//    //调用收缩滤镜方法的方法
-//    [self resumeState];
-//    [self btnState:btn];
+    [_videoCamera removeTarget:_filter];
+    
+    _filter = mFilter;
+    
+    // 添加滤镜到相机上
+    [_videoCamera addTarget:_filter];
+    [_filter addTarget:_filterView];
+
+
     
 }
 
-//
-//- (void)btnAction:(UIButton *)btn{
-//    
-//    switch (btn.tag) {
-//        case (EffctTypeOne):{
-//            //创建一个新的滤镜
-//            GPUImageBulgeDistortionFilter *mfilter = [[GPUImageBulgeDistortionFilter alloc]init];
-//            
-//            //调用切换滤镜方法
-//            [self changeEffct:mfilter withBtn:btn];
-//        }
-//            break;
-//        case (EffctTypeTwo):{
-//            GPUImagePinchDistortionFilter *mfilter = [[GPUImagePinchDistortionFilter alloc]init];
-//            [self changeEffct:mfilter withBtn:btn];
-//        }
-//            break;
-//        case (EffctTypeThree):{
-//            GPUImageStretchDistortionFilter *mfilter = [[GPUImageStretchDistortionFilter alloc]init];
-//            [self changeEffct:mfilter withBtn:btn];
-//        }
-//            break;
-//        case (EffctTypeFour):{
-//            GPUImageGlassSphereFilter *mfilter = [[GPUImageGlassSphereFilter alloc]init];
-//            
-//            [self changeEffct:mfilter withBtn:btn];
-//        }
-//            break;
-//        case (EffctTypeFive):{
-//            GPUImageVignetteFilter *mfilter = [[GPUImageVignetteFilter alloc]init];
-//            [self changeEffct:mfilter withBtn:btn];
-//        }
-//            break;
-//            
-//        default:
-//            break;
-//    }
-//}
+
+
+#pragma mark - FilterListCollection Delegate
+
+- (void)FilterSelected:(NSInteger)num{
+    
+    //创建一个新的滤镜
+    
+    GPUImageFilterGroup * FilterGroup = [[NSClassFromString(FilterArray[num]) alloc]init];
+    //调用切换滤镜方法
+    [self changeEffct:FilterGroup];
+    
+    
+    //关闭
+    self.FilterListBtn.selected = NO;
+    self.FilterListCollection.hidden = YES;
+}
+
+
+- (FilterListCollectionView *)FilterListCollection{
+    
+    if (!_FilterListCollection) {
+        
+        _FilterListCollection = [FilterListCollectionView CreateFilterView];
+        _FilterListCollection.FilterDelegate = self;
+        [self.view addSubview:_FilterListCollection];
+        [_FilterListCollection mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+            make.centerY.equalTo(self.FilterListBtn).offset(0);
+            make.left.equalTo(self.FilterListBtn.mas_right).offset(10);
+            make.right.equalTo(self.view).offset(-10);
+            make.height.mas_equalTo(140);
+            
+        }];
+        
+    }
+    
+    return _FilterListCollection;
+    
+}
 
 
 

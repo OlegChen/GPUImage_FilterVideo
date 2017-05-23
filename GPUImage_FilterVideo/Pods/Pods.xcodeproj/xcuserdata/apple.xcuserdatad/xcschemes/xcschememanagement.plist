@@ -4,11 +4,6 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>GPUImage.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>Masonry.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -22,17 +17,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>4F69F82C1EEBC0A05686A3B0FECD2FDB</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
 		<key>9DC8D9E02903E93BD0B2FEC9D846EA20</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>F22B6CE4490087162E69F84DD9A17E79</key>
+		<key>F43B00CBCF990366E436C11F176AA080</key>
 		<dict>
 			<key>primary</key>
 			<true/>
